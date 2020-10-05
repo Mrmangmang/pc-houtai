@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
 <!--    路由出口-->
     <router-view/>
   </div>
@@ -8,10 +7,16 @@
 
 <script>
   export  default  {
-    name:'App'
+    name:'App',
+      data () {
+          return {
+              radio: '选中且禁用'
+          };
+      }
   }
 </script>
 
 
 <style lang="less">
+
 </style>
