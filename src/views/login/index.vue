@@ -110,7 +110,7 @@
                 //validate方法是异步的
                 // console.log(this.$refs['login-form'])
                 this.$refs['login-form'].validate(valid=>{
-                    console.log(valid)
+                    // console.log(valid)
                     // console.log(err)
                     // 如果表单验证失败，停止请求提交
                     if(!valid){
@@ -129,15 +129,20 @@
                 //2.实际工作中，接口非常容易变动，改起来很麻烦
                 //3.建议把所有的请求都封装成函数然后同意的组织到模块中进行
                 //管理维护更方便，可重用
-                //
-
                 login(this.user).then( res => {
+                        //登录成功
                         this.$message({
                             message: '登录成功',
                             type: 'success'
                         });
                         //关闭loading
                         this.loginLoading = false
+                         //将接口返回的用户相关数据放到本地存储，方便应用数据共享
+                         // 本地存储只能存储字符串
+                         //如果需要存储对象，数组类型的数据，则把他们转为json格式字符串进行存储
+                         // window.localStorage.setItem('user',res.data.data)
+                    // console.log(res)
+                         window.localStorage.setItem('user',JSON.stringify(res.data.data))
                         // console.log(res)
                         //跳转到首页
                         this.$router.push('/')
