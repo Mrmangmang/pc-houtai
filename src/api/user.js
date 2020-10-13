@@ -18,7 +18,7 @@ export const  login = data =>{
 export const getUserProfile = () =>{
     // const  user = window.localStorage.getItem('user')
     // const  user = JSON.parse(window.localStorage.getItem('user'))
-    console.log(user)
+    // console.log(user)
     return request ({
         method:'GET',
         url:'/mp/v1_0/user/profile',

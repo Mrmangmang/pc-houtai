@@ -10,18 +10,18 @@ const request = axios.create({
 })
 
 //请求拦截器
-request.interceptors.request.use({
-   //任何所有请求都会经过这里
+request.interceptors.request.use(
+    //任何所有请求都会经过这里
     //config 是当前请求相关的配置对象信息
     // config 可以更改
     function (config){
         const  user = JSON.parse(window.localStorage.getItem('user'))
         //如果有登录用户信息，则统一设置 token
         if(user){
-            config.headers.Authorization = `Bearer $ {user.token} `
+            config.headers.Authorization = `Bearer ${user.token}`
         }
         return config
-    }
+        // 报401 （token未传过来或者过期）
 })
 
 
