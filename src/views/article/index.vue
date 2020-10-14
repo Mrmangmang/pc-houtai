@@ -58,9 +58,32 @@
                     class="list-table"
             >
                 <el-table-column
-                        prop="date"
                         label="封面"
                         >
+                    <template
+                            v-slot = 'scope'
+                    >
+<!--scope.row 当前行对象-->
+<!--                        {{scope.row}}-->
+                        <img
+                                v-if = "scope.row.cover.images[0]"
+                                class="article-cover"
+                                :src="scope.row.cover.images[0]"
+                        />
+                        <img v-else
+                             class="article-cover"
+                             src="./test.jpg"
+                        >
+<!--                        下面这种情况是在运行期间动态改变处理的，-->
+<!--                        而本地图片必须在打包的时候就存在-->
+<!--                        打包的时候无法判定这个下面那个条件-->
+<!--                        引用的资源必须经过打包处理-->
+<!--                        所以才能动态的渲染出来-->
+<!--                        要不然就访问不到-->
+
+
+
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="title"
@@ -68,24 +91,31 @@
                        >
                 </el-table-column>
                 <el-table-column
-                        prop="status"
-                        label="状态">
+                        label="状态"
+                >
+<!--                    如果需要在自定义列模板中获取当前遍历项数据，那么就要在template上声明-->
+<!--                    通过scope.row才能便可以遍历所有数据，-->
                     <template v-slot = 'scope'>
-                        <el-tag v-if="scope.row.status === 0">
-                            草稿
+                        <el-tag
+                                :type="articleStatus[scope.row.status].type"
+                        >
+                                {{articleStatus[scope.row.status].text}}
                         </el-tag>
-                        <el-tag v-else-if="scope.row.status === 1">
-                            待审核
-                        </el-tag>
-                        <el-tag v-else-if="scope.row.status === 2">
-                            审核通过
-                        </el-tag>
-                        <el-tag v-else-if="scope.row.status === 3">
-                            审核失败
-                        </el-tag>
-                        <el-tag v-else-if="scope.row.status === 4">
-                            已删除
-                        </el-tag>
+<!--                        <el-tag v-if="scope.row.status === 0">-->
+<!--                            草稿-->
+<!--                        </el-tag>-->
+<!--                        <el-tag v-else-if="scope.row.status === 1">-->
+<!--                            待审核-->
+<!--                        </el-tag>-->
+<!--                        <el-tag v-else-if="scope.row.status === 2">-->
+<!--                            审核通过-->
+<!--                        </el-tag>-->
+<!--                        <el-tag v-else-if="scope.row.status === 3">-->
+<!--                            审核失败-->
+<!--                        </el-tag>-->
+<!--                        <el-tag v-else-if="scope.row.status === 4">-->
+<!--                            已删除-->
+<!--                        </el-tag>-->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -148,7 +178,14 @@
                     resource: '',
                     desc: ''
                 },
-                articles:[],
+                articles:[],//文章数据列表
+                articleStatus:[
+                    { status : 0, text:"草稿" ,type: 'info' }, //0
+                    { status : 1, text:"待审核" ,type: '' }, //1
+                    { status : 2, text:"审核通过" ,type: 'success' }, //2
+                    { status : 3, text:"审核失败" ,type: 'warning' }, //3
+                    { status : 4, text:"已删除" ,type: 'danger' }, //4
+                ]
             }
         },
         computed: {},
@@ -179,5 +216,9 @@
    }
     .list-table{
         margin-bottom: 30px;
+    }
+    .article-cover{
+        width: 100px;
+        background-size: cover;
     }
 </style>
