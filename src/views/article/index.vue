@@ -11,31 +11,49 @@
                 <!--        面包屑导航-->
             </div>
             <!--        数据筛选菜单-->
-            <el-form ref="form" :model="form" label-width="40px">
+            <el-form
+                    ref="form"
+                    :model="form"
+                    label-width="40px"
+                    v-loading = 'loading'
+            >
                 <el-form-item label="状态">
-                    <el-radio-group v-model="form.resource">
-                        <el-radio label="全部"></el-radio>
-                        <el-radio label="草稿"></el-radio>
-                        <el-radio label="待审核"></el-radio>
-                        <el-radio label="审核通过"></el-radio>
-                        <el-radio label="审核失败"></el-radio>
-                        <el-radio label="已删除"></el-radio>
+                    <el-radio-group v-model="status">
+                        <el-radio :label="null">全部</el-radio>
+                        <el-radio :label="0">草稿</el-radio>
+                        <el-radio :label="1">待审核</el-radio>
+                        <el-radio :label="2">审核通过</el-radio>
+                        <el-radio :label="3">审核失败</el-radio>
+                        <el-radio :label="4">已删除</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="频道">
-                    <el-select v-model="form.region" placeholder="请选择频道">
-                        <el-option label="区域一" value="shanghai"></el-option>
-                        <el-option label="区域二" value="beijing"></el-option>
+                    <el-select v-model="channelId" placeholder="请选择频道">
+                        <el-option
+                                label="全部"
+                                :value="null"
+                        >
+                        </el-option>
+                        <el-option
+                                v-for="(channel,index) in channels"
+                                :label="channel.name"
+                                :value="channel.id"
+                                :key="index"
+                        >
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="时间">
-                    <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-                    </el-col>
-                    <el-col class="line" :span="2">-</el-col>
-                    <el-col :span="11">
-                        <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-                    </el-col>
+                        <el-date-picker
+                                type="datetimerange"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                style="width: 100%;"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                :default-time="['12:00:00']"
+                                v-model="rangeDate"
+                        ></el-date-picker>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -43,12 +61,9 @@
             </el-form>
             <!--        数据筛选菜单-->
         </el-card>
-
-
-
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                根据条件共查询了1213结果
+                根据条件共查询了{{total_count}}结果
             </div>
 <!--            数据列表-->
             <el-table
@@ -56,6 +71,7 @@
                     style="width: 100%"
                     stripe
                     class="list-table"
+                    v-loading="loading"
             >
                 <el-table-column
                         label="封面"
@@ -65,23 +81,33 @@
                     >
 <!--scope.row 当前行对象-->
 <!--                        {{scope.row}}-->
-                        <img
-                                v-if = "scope.row.cover.images[0]"
-                                class="article-cover"
+<!--                        <img-->
+<!--                                v-if = "scope.row.cover.images[0]"-->
+<!--                                class="article-cover"-->
+<!--                                :src="scope.row.cover.images[0]"-->
+<!--                        />-->
+<!--                        <img v-else-->
+<!--                             class="article-cover"-->
+<!--                             src="./test.jpg"-->
+<!--                        >-->
+                        <el-image
+
+                                style="width: 100px;height: 100px"
                                 :src="scope.row.cover.images[0]"
-                        />
-                        <img v-else
-                             class="article-cover"
-                             src="./test.jpg"
+                                fit="cover"
                         >
+                            <div slot="placeholder" class="image-slot">
+                                加载中 <span class="dot"></span>
+                            </div>
+                        </el-image>
+
+
 <!--                        下面这种情况是在运行期间动态改变处理的，-->
 <!--                        而本地图片必须在打包的时候就存在-->
 <!--                        打包的时候无法判定这个下面那个条件-->
 <!--                        引用的资源必须经过打包处理-->
 <!--                        所以才能动态的渲染出来-->
 <!--                        要不然就访问不到-->
-
-
 
                     </template>
                 </el-table-column>
@@ -137,6 +163,7 @@
                                 circle
                                 type="danger"
                                 icon="el-icon-delete"
+                                @click="onDeleteArticle"
                                 ></el-button>
                     </template>
                 </el-table-column>
@@ -145,21 +172,20 @@
             <!--        列表分页-->
             <el-pagination
                     layout="prev, pager, next"
-                    :total="1000"
+                    :total="total_count"
                     background
+                    @current-change = "handleCurrentChange"
+                    :page-size="pageSize"
+                    :disabled="loading"
             >
             </el-pagination>
             <!--        列表分页-->
         </el-card>
-
-
-
-
     </div>
 </template>
 
 <script>
-    import {getArticles} from "@/api/article";
+    import {getArticles , getArticlesChannels } from "@/api/article";
 
 
     export default {
@@ -185,27 +211,75 @@
                     { status : 2, text:"审核通过" ,type: 'success' }, //2
                     { status : 3, text:"审核失败" ,type: 'warning' }, //3
                     { status : 4, text:"已删除" ,type: 'danger' }, //4
-                ]
+                ],
+                total_count:0 ,// 总数据条数
+                pageSize : 10, //每页大小
+                channels:[], //文章频道列表
+                status:null, // 文章频道状态
+                channelId:null, // 频道id，不传为全部
+                rangeDate:'' ,//筛选的范围日期
+                loading:false //表单数据加载中loading
             }
         },
         computed: {},
         watch: {},
         created() {
             this.loadArticles()
+            this.loadChannels()
         },
         mounted() {
         },
         methods: {
-            loadArticles(){
-              getArticles().then( res =>{
-                  this.articles = res.data.data.results
-                  // console.log(this.articles)
+            //获取当前页 ,点击之后触发，
+            handleCurrentChange(page){
+                // console.log(page)
+                this.loadArticles(page)
+            },
+
+
+            //发送请求
+            loadArticles( page = 1  ){
+                //loading开始
+                this.loading = true
+              getArticles(
+                  {
+                      page,
+                      per_page:this.pageSize,
+                      status:this.status,
+                      channel_id:this.channelId,
+                      begin_pubdate:this.rangeDate ?   this.rangeDate[0] : null, //开始日期
+                      end_pubdate: this.rangeDate ?  this.rangeDate[1] :null //截止时间
+                  }
+              ).then( res =>{
+                  // console.log(res)
+                  // this.articles = res.data.data.results
+                  // this.total_count = res.data.data.total_count
+                  // console.log(res.data.data)
+                  const { results, total_count:totalCount } = res.data.data
+                  this.articles = results
+                  this.total_count = totalCount
+                  //关闭加载中loading
+                  this.loading = false
                 }
               )
             },
             onSubmit() {
-                console.log('submit!');
+                this.loadArticles()
             },
+            loadChannels(){
+                getArticlesChannels().then( res => {
+                     // console.log(res)
+                     this.channels = res.data.data.channels
+                    }
+                )
+            },
+            onDeleteArticle(){
+                //找到数据接口
+                //封装请求方法
+                //删除请求调用
+                //处理响应结果
+
+            }
         }
     }
 </script>
@@ -218,7 +292,7 @@
         margin-bottom: 30px;
     }
     .article-cover{
-        width: 100px;
+        width: 60px;
         background-size: cover;
     }
 </style>
