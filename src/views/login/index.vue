@@ -141,7 +141,7 @@
                          // 本地存储只能存储字符串
                          //如果需要存储对象，数组类型的数据，则把他们转为json格式字符串进行存储
                          // window.localStorage.setItem('user',res.data.data)
-                    // console.log(res)
+                         // console.log(res)
                          window.localStorage.setItem('user',JSON.stringify(res.data.data))
                         // console.log(res)
                         //跳转到首页

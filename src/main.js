@@ -4,6 +4,16 @@ import router from './router'
 import './styles/index.less' //加载全局样文件
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import JSONbig from 'json-bigint'
+
+
+// const  str  = '{"id" : 12324523456246543 }'
+
+// console.log(JSON.parse(str))
+// 他会把超出 JS 安全整数范围的数字转为一种类型的BigNumber
+// 我们在使用的时候需要把这个BigNumber.toString()就能得到原来的
+// console.log(JSONbig.parse(str))
+// console.log(JSONbig.parse(str).id.toString())
 
 
 
@@ -11,9 +21,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.config.productionTip = false
 
+//全局使用 element 组件库
 Vue.use(ElementUI)
-
-
 
 
 //创建 vue 根实例

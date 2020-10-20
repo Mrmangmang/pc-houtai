@@ -29,9 +29,11 @@ export const getArticlesChannels = () =>{
 /*
   删除文档
  */
-export const deleteArticlesChannels = () =>{
+export const deleteArticle = (articleId) =>{
     return request ({
+        //接口文档中写的路径需要参数的 需要在url中传递
+        //凡是看见接口路径中有的 ： *** ： 格式的字段，则需要传递路径参数
         method:'DELETE',
-        url:'/mp/v1_0/articles/:target',
+        url:`/mp/v1_0/articles/${articleId}`,
     })
 }

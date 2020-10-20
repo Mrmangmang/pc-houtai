@@ -6,7 +6,7 @@
                 <el-breadcrumb separator-class="el-icon-arrow-right">
                     <el-breadcrumb-item to="/">首页
                     </el-breadcrumb-item>
-                    <el-breadcrumb-item>内容管理</el-breadcrumb-item>
+                    <el-breadcrumb-item>发布文章</el-breadcrumb-item>
                 </el-breadcrumb>
                 <!--        面包屑导航-->
             </div>
@@ -149,7 +149,6 @@
                         label="发布时间">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
                         label="操作">
                     <template v-slot="scope">
                         <el-button
@@ -163,7 +162,7 @@
                                 circle
                                 type="danger"
                                 icon="el-icon-delete"
-                                @click="onDeleteArticle"
+                                @click="onDeleteArticle(scope.row.id)"
                                 ></el-button>
                     </template>
                 </el-table-column>
@@ -177,6 +176,7 @@
                     @current-change = "handleCurrentChange"
                     :page-size="pageSize"
                     :disabled="loading"
+                    :current-page.sync="page"
             >
             </el-pagination>
             <!--        列表分页-->
@@ -185,7 +185,11 @@
 </template>
 
 <script>
-    import {getArticles , getArticlesChannels } from "@/api/article";
+    import {
+        getArticles ,
+        getArticlesChannels,
+        deleteArticle
+    } from "@/api/article";
 
 
     export default {
@@ -218,7 +222,9 @@
                 status:null, // 文章频道状态
                 channelId:null, // 频道id，不传为全部
                 rangeDate:'' ,//筛选的范围日期
-                loading:false //表单数据加载中loading
+                loading:false, //表单数据加载中loading
+                page:1,
+
             }
         },
         computed: {},
@@ -273,12 +279,32 @@
                     }
                 )
             },
-            onDeleteArticle(){
+
+            onDeleteArticle(articleId){
+                // console.log(articleId)
+                // console.log(articleId.toString())
+                this.$confirm('确认删除吗？', '退出提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    // console.log(123)
+                    //确定执行这里
+                    deleteArticle(articleId.toString()).then( res =>{
+                        //删除成功，更新当前页文章数据列表
+                        // console.log(res)
+                        this.loadArticles(this.page) // current-page实现当前页
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
                 //找到数据接口
                 //封装请求方法
                 //删除请求调用
                 //处理响应结果
-
             }
         }
     }
