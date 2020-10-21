@@ -27,7 +27,7 @@ export const getArticlesChannels = () =>{
     })
 }
 /*
-  删除文档
+  删除文章
  */
 export const deleteArticle = (articleId) =>{
     return request ({
@@ -37,3 +37,20 @@ export const deleteArticle = (articleId) =>{
         url:`/mp/v1_0/articles/${articleId}`,
     })
 }
+/*
+  新建文章
+ */
+//参数前后无所谓，但是如果有多个参数，一般都是有默认值的放在后面
+export const addArticle = (data,draft = false) =>{
+    return request ({
+        //接口文档中写的路径需要参数的 需要在url中传递
+        //凡是看见接口路径中有的 ： *** ： 格式的字段，则需要传递路径参数
+        method:'POST',
+        url:'/mp/v1_0/articles',
+        params:{
+            draft //是否保存为草稿
+        },
+        data
+    })
+}
+// addArticle(123)

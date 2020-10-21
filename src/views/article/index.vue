@@ -242,8 +242,7 @@
                 this.loadArticles(page)
             },
 
-
-            //发送请求
+            //发送请求 （获取文章列表）
             loadArticles( page = 1  ){
                 //loading开始
                 this.loading = true
@@ -269,9 +268,11 @@
                 }
               )
             },
+
             onSubmit() {
                 this.loadArticles()
             },
+
             loadChannels(){
                 getArticlesChannels().then( res => {
                      // console.log(res)
@@ -279,7 +280,6 @@
                     }
                 )
             },
-
             onDeleteArticle(articleId){
                 // console.log(articleId)
                 // console.log(articleId.toString())
