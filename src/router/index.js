@@ -31,7 +31,7 @@ const routes = [
         // 因为我们在手动输入网址访问网站的时候 ， 可以省略 /
         //如果你是别的名称 ， 则必须加上
         path:'', //path 为空 ， 会作为默认子路由渲染
-        name:'home', // 此处写了name，则会跳这个name 
+        name:'home', // 此处写了name，则会跳这个name
         component:Home
       },
       {

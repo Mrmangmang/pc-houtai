@@ -54,3 +54,30 @@ export const addArticle = (data,draft = false) =>{
     })
 }
 // addArticle(123)
+
+/*
+   编辑文章
+*/
+export const updateArticle = (articleId , data, draft = false ) =>{
+    return request ({
+        //接口文档中写的路径需要参数的 需要在url中传递
+        //凡是看见接口路径中有的 ： *** ： 格式的字段，则需要传递路径参数
+        method:'PUT',
+        url:`/mp/v1_0/articles/${articleId}`,   // es6字符串拼接
+        params:{
+            draft //是否保存为草稿
+        },
+        data
+    })
+}
+/*/
+   获取指定文章
+ */
+export const getArticle = articleId =>{
+    return request ({
+        //接口文档中写的路径需要参数的 需要在url中传递
+        //凡是看见接口路径中有的 ： *** ： 格式的字段，则需要传递路径参数
+        method:'GET',
+        url:`/mp/v1_0/articles/${articleId}`,
+    })
+}

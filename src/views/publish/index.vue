@@ -52,6 +52,8 @@
     import {
         getArticlesChannels,
         addArticle,
+        getArticle,
+        updateArticle,
     } from "@/api/article";
 
     export default {
@@ -77,6 +79,12 @@
         watch: {},
         created() {
             this.loadChannels()
+            //由于我们让发布和修改使用同一个组件
+            //所以这里要判断
+            //如果路由路径参数中有id，则请求展示文章内容
+            if(this.$route.query.id){
+                this.loadArticle()
+            }
         },
         mounted() {
         },
@@ -90,12 +98,35 @@
                 )
             },
             onPublish(draft = false ){
-                addArticle(this.article , draft).then( res=>{
-                    console.log(res)
-                    this.$message({
-                        message:'发布成功',
-                        type:'success'
+                //如果是修改文章，则执行修改操作，否则执行添加操作
+                const  articleId = this.$route.query.id
+                if(articleId){
+                    //执行修改操作
+                    updateArticle(articleId,this.article,draft).then(
+                        res => {
+                            console.log(res)
+                        },
+                        this.$message({
+                            message:'修改成功',
+                            type:'success'
+                        })
+                    )
+                }else{
+                    addArticle(this.article , draft).then( res=>{
+                        console.log(res)
+                        this.$message({
+                            message:'发布成功',
+                            type:'success'
+                        })
                     })
+                }
+
+            },
+            //修改文章内容：加载文章内容
+            loadArticle(){
+                getArticle(this.$route.query.id).then( res=>{
+                    //模板绑定展示
+                    this.article = res.data.data
                 })
             }
         }
