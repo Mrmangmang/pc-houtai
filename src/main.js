@@ -6,6 +6,8 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import JSONbig from 'json-bigint'
 
+// import { ElementTiptapPlugin } from 'element-tiptap';
+// 现在你已经在全局注册了 `el-tiptap` 组件。
 
 // const  str  = '{"id" : 12324523456246543 }'
 
@@ -23,6 +25,10 @@ Vue.config.productionTip = false
 
 //全局使用 element 组件库
 Vue.use(ElementUI)
+
+// Vue.use(ElementTiptapPlugin, {
+//   lang: 'zh',
+// });
 
 
 //创建 vue 根实例

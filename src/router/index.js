@@ -58,7 +58,7 @@ const router = new VueRouter({
 //from ： 来自哪里的路由信息
 //next ：放行方法
 router.beforeEach((to,from,next) =>{
-  //如果要访问的也米娜不是/login，校验登录状态
+  //如果要访问的不是/login，校验登录状态
   //如果没有登录，则跳转到登录页面
   //如果登录了，则允许通过
   //允许通过

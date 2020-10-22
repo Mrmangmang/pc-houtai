@@ -12,12 +12,27 @@
                 <!--面包屑路径导航-->
             </div>
 <!--            活动名称-->
-            <el-form ref="form" :model="article" label-width="40px">
-                <el-form-item label="标题">
+            <el-form
+                    ref="form"
+                    :model="article"
+                    label-width="60px"
+                    :rules="formRules"
+            >
+                <el-form-item label="标题" prop="title">
                     <el-input v-model="article.title"></el-input>
                 </el-form-item>
-                <el-form-item label="内容">
-                    <el-input type="textarea" v-model="article.content"></el-input>
+                <el-form-item label="内容" prop="content">
+<!--                    <el-input type="textarea" v-model="article.content"></el-input>-->
+                    <el-tiptap
+                            v-model="article.content"
+                            :extensions="extensions"
+                            lang = "zh"
+                            height = "400"
+                            placeholder = '请输入文章内容'
+                    >
+                    </el-tiptap>
+
+
                 </el-form-item>
                 <el-form-item label="封面">
                     <el-radio-group v-model="article.cover.type">
@@ -55,10 +70,38 @@
         getArticle,
         updateArticle,
     } from "@/api/article";
+    // import element-tiptap 样式
+    import 'element-tiptap/lib/index.css';
+    import {
+        uploadImage
+    } from "@/api/image";
+    import {
+        ElementTiptap,
+        Doc,
+        Text,
+        Paragraph,
+        Heading,
+        Bold,
+        Underline,
+        Italic,
+        Image,
+        Strike,
+        ListItem,
+        BulletList,
+        OrderedList,
+        TodoItem,
+        TodoList,
+        HorizontalRule,
+        Fullscreen,
+        Preview,
+        CodeBlock
+    } from 'element-tiptap';
 
     export default {
         name:'PublishIndex',
-        components: {},
+        components: {
+            'el-tiptap':ElementTiptap
+        },
         props: {},
         data() {
             return {
@@ -72,6 +115,59 @@
                         images:[] //封面图片地址
                     },
                     channel_id:null
+                },
+                extensions: [
+                    new Doc(),
+                    new Text(),
+                    new Paragraph(),
+                    new Heading({ level: 3 }),
+                    new Bold({ bubble: true }), // 在气泡菜单中渲染菜单按钮
+                    new Image({
+                        // 默认会把图片生成 base64
+                        //字符串和内容存储在一起，如果需要自定义图片上传
+                        uploadRequest(file){
+                            const fd = new FormData()
+                            fd.append('image',file)
+                            // 第一个 return 是返回Promise 对象
+                            // 为什么？ 因为axios 本身就是返回 Promise 对象
+                            return uploadImage(fd).then( res =>{
+                                // console.log(res)
+                                //这个 return 是返回最后的结果
+                                return res.data.data.url
+                            })
+                        }// 图片的上传方法，返回一个 Promise<url>
+                    }),
+                    new Underline(), // 下划线
+                    new Italic(), // 斜体
+                    new Strike(), // 删除线
+                    new HorizontalRule(), // 华丽的分割线
+                    new ListItem(),
+                    new BulletList(), // 无序列表
+                    new OrderedList(), // 有序列表
+                    new TodoItem(),
+                    new TodoList(),
+                    new Fullscreen(),
+                    new Preview(),
+                    new CodeBlock()
+                ],
+                formRules: {
+                   title:[
+                       { required: true, message: '请输入活动名称', trigger: 'blur' },
+                       { min: 5, max: 30, message: '长度在 5 到 30 个字符', trigger: 'blur' }
+                   ],
+                    content: [
+                        {
+                            validator(rule, value,callback){
+                                if(value === '<p></p>'){
+                                    //验证失败
+                                    callback(new Error('请输入文章内容'))
+                                }else {
+                                    //验证通过
+                                    callback()
+                                }
+                            }
+                        }
+                    ]
                 }
             }
         },
