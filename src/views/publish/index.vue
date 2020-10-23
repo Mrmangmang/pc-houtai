@@ -13,16 +13,15 @@
             </div>
 <!--            活动名称-->
             <el-form
-                    ref="form"
                     :model="article"
                     label-width="60px"
                     :rules="formRules"
+                    ref="publish-form"
             >
                 <el-form-item label="标题" prop="title">
                     <el-input v-model="article.title"></el-input>
                 </el-form-item>
                 <el-form-item label="内容" prop="content">
-<!--                    <el-input type="textarea" v-model="article.content"></el-input>-->
                     <el-tiptap
                             v-model="article.content"
                             :extensions="extensions"
@@ -31,8 +30,6 @@
                             placeholder = '请输入文章内容'
                     >
                     </el-tiptap>
-
-
                 </el-form-item>
                 <el-form-item label="封面">
                     <el-radio-group v-model="article.cover.type">
@@ -42,7 +39,7 @@
                         <el-radio :label="-1">自动</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="频道">
+                <el-form-item prop="channel_id" label="频道">
                     <el-select v-model="article.channel_id" placeholder="请选择频道">
                         <el-option
                                 v-for="(channel,index) in channels"
@@ -151,13 +148,14 @@
                     new CodeBlock()
                 ],
                 formRules: {
-                   title:[
+                    title:[
                        { required: true, message: '请输入活动名称', trigger: 'blur' },
                        { min: 5, max: 30, message: '长度在 5 到 30 个字符', trigger: 'blur' }
                    ],
                     content: [
                         {
-                            validator(rule, value,callback){
+                            validator(rule, value, callback ){
+                                console.log('123')
                                 if(value === '<p></p>'){
                                     //验证失败
                                     callback(new Error('请输入文章内容'))
@@ -166,7 +164,11 @@
                                     callback()
                                 }
                             }
-                        }
+                        },
+                        { required:true , message:'请输入文章内容', trigger:'blur'  }
+                    ],
+                    channel_id:[
+                        { required:true , message:'请输入文章频道'  }
                     ]
                 }
             }
@@ -194,6 +196,17 @@
                 )
             },
             onPublish(draft = false ){
+                this.$refs['publish-form'].validate((valid) => {
+                    //验证失败，则停止提交表单
+                    if (!valid) {
+                        // alert('submit!');k
+                        return
+                    } else {
+                        //验证通过，提交表单
+                        // console.log('error submit!!');
+                        // return false;
+                    }
+                });
                 //如果是修改文章，则执行修改操作，否则执行添加操作
                 const  articleId = this.$route.query.id
                 if(articleId){
